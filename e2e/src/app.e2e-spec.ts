@@ -10,16 +10,9 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  // it('should display welcome message', () => {
-  //   page.navigateTo();
-  //   expect(page.getParagraphText()).toEqual('Welcome to selenium-protactor!');
-  // });
-
-  it('launch google', () => {
-   // page.navigateTo();
-   browser.waitForAngularEnabled(false);
+  it('launch darksky and forecast hours in timeline incremented by 2 hours for next 24 hours', () => {
+    browser.waitForAngularEnabled(false);
     browser.get('https://darksky.net/');
-    // expect(page.getParagraphText()).toEqual('Welcome to selenium-protactor!');
 
     const searchBox = element(by.id('searchForm')).element(by.tagName('input'));
     const searchButton = element(by.id('searchForm')).element(by.css('.searchButton'));
@@ -27,26 +20,42 @@ describe('workspace-project App', () => {
     searchBox.sendKeys('10001');
     searchButton.click();
 
-
     const currentTime = new Date().getHours();
-     console.log(currentTime);
-    // console.log('current:' + (page.getTime(currentTime)));
-    // console.log(currentTime);
-    // browser.sleep(2000);
+    browser.sleep(2000);
 
 
     for (let i = 1; i <= 22; i = i + 2) {
       if (i === 1) {
-        // const now = element(by.id('timeline')).element(by.className('Now'));
         const now = browser.findElement(by.className('Now'));
         expect(now.getText()).toBe('Now');
         i = i - 1;
       } else {
-        console.log(page.getTime(currentTime + i));
         const forecastHours = element(by.id('timeline')).element(by.className(page.getTime(currentTime + i)));
         expect(forecastHours.getText()).toEqual(page.getTime(currentTime + i));
-        console.log('end of test');
       }
     }
   });
+
+    it('verify current temp is greater than lowest value temp and less than the highest value temp', async () => {
+      browser.waitForAngularEnabled(false);
+      browser.get('https://darksky.net/');
+
+      const searchBox = element(by.id('searchForm')).element(by.tagName('input'));
+      const searchButton = element(by.id('searchForm')).element(by.css('.searchButton'));
+      searchBox.clear();
+      searchBox.sendKeys('10001');
+      searchButton.click();
+
+      await browser.sleep(2000);
+      const currentTemp = await browser.findElement(by.id('timeline'))
+                          .findElement(by.className('temps'))
+                          .findElement(by.className('first')).getText();
+      const lowTemp = await browser.findElement(by.className('low-temp-text')).getText();
+      const highTemp = await browser.findElement(by.className('high-temp-text')).getText();
+
+      expect(parseInt(currentTemp)).toBeGreaterThan(parseInt(lowTemp));
+      expect(parseInt(currentTemp)).toBeLessThan(parseInt(highTemp));
+
+    });
+
 });
