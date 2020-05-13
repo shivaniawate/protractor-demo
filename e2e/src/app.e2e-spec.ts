@@ -20,7 +20,7 @@ describe('workspace-project App', () => {
     searchBox.sendKeys('10001');
     searchButton.click();
 
-    const currentTime = new Date().getHours();
+    const currentTime = new Date().getHours() + 1;
     browser.sleep(2000);
 
 
